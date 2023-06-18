@@ -1,5 +1,5 @@
 {
-  "name": "odd-app-template",
+  "name": "dnotes",
   "version": "0.1.0",
   "scripts": {
     "dev": "vite dev",

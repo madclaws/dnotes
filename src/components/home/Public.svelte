@@ -8,15 +8,14 @@
 <div
   class="min-h-[calc(100vh-96px)] flex flex-col items-start justify-center max-w-[700px] m-auto gap-6 pb-5 text-sm"
 >
-  <h1 class="text-xl">Welcome to the {appName}</h1>
+  <h1 class="text-xl">Welcome to {appName}</h1>
 
   <div class="max-w-[590px]">
     <p class="mb-5">
-      The ODD SDK is a true local-first edge computing stack. Effortlessly give
-      your users:
+      A local-first decentralized note taking app
     </p>
 
-    <ul class="mb-6 pl-6 list-disc">
+    <!-- <ul class="mb-6 pl-6 list-disc">
       <li>
         <span class="font-bold">modern, passwordless accounts</span>
         , without a complex and costly cloud-native back-end
@@ -29,7 +28,7 @@
         <span class="font-bold">local-first functionality</span>
         , including the ability to work offline and collaborate across multiple devices
       </li>
-    </ul>
+    </ul> -->
 
     {#if $sessionStore.error === 'Unsupported Browser'}
       <div class="p-4 rounded-lg bg-base-content text-neutral-50">
@@ -48,9 +47,9 @@
         <a class="btn btn-primary !btn-lg !h-10 gap-2" href="/register">
           <Connect /> Connect this device
         </a>
-        <a class="btn btn-outline" href="/recover">
+        <!-- <a class="btn btn-outline" href="/recover">
           Recover an existing account
-        </a>
+        </a> -->
       </div>
     {/if}
   </div>

@@ -14,8 +14,9 @@ export const initialize = async (): Promise<void> => {
       namespace: oddNamespace,
       debug: dev
     })
-
+    console.log(program);
     if (program.session) {
+      console.log("Authed")
       // Authed
       backupStatus = await getBackupStatus(program.session.fs)
 
@@ -47,6 +48,7 @@ export const initialize = async (): Promise<void> => {
 
     } else {
       // Not authed
+      console.log("Not authed", program.auth)
       sessionStore.set({
         username: null,
         session: null,
