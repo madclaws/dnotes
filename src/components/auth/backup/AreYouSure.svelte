@@ -27,12 +27,12 @@
         you will not be able to recover your account data.
       </p>
 
-      <button
+      <!-- <button
         class="btn btn-primary"
         on:click={() => goto('/delegate-account')}
       >
         Connect a backup device
-      </button>
+      </button> -->
       <span
         class="text-error underline block mt-4 text-sm text-red-600 cursor-pointer"
         on:click={skipBackup}

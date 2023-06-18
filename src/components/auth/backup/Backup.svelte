@@ -26,12 +26,12 @@
         device.
       </p>
 
-      <button
+      <!-- <button
         class="btn btn-primary"
         on:click={() => goto('/delegate-account')}
       >
         Connect a backup device
-      </button>
+      </button> -->
       <button
         class="btn btn-xs btn-link text-sm underline mt-4"
         on:click={() => navigate('are-you-sure')}

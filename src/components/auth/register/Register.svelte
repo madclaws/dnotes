@@ -159,14 +159,14 @@
 
     <!-- Existing Account -->
     <div class="flex flex-col gap-5 w-full">
-      <button
+      <!-- <button
         class="btn btn-outline !h-[52px] w-full {existingAccount
           ? '!bg-base-content !text-base-100 !border-base-content'
           : ''}"
         on:click={toggleExistingAccount}
       >
         I have an existing account
-      </button>
+      </button> -->
       {#if existingAccount}
         <div
           class="flex flex-col gap-4 p-6 rounded bg-neutral-200 text-neutral-900"
@@ -185,6 +185,6 @@
     </div>
 
     <!-- Recovery Link -->
-    <a href="/recover" class="underline">Recover an account</a>
+    <!-- <a href="/recover" class="underline">Recover an account</a> -->
   </div>
 {/if}

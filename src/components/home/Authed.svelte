@@ -9,16 +9,16 @@
 >
   <h1 class="text-xl">Welcome, {$sessionStore.username.trimmed}!</h1>
 
-  <div class="flex flex-col items-start justify-center gap-5">
+  <!-- <div class="flex flex-col items-start justify-center gap-5">
     <h2 class="text-lg">Photo Gallery Demo</h2>
     <p>
       The ODD SDK makes it easy to implement private, encrypted, user-owned
       storage in your app. See it in action with our photo gallery demo.
     </p>
     <a class="btn btn-primary" href="/gallery">Try the Photo Gallery Demo</a>
-  </div>
+  </div> -->
 
-  <div class="flex flex-col items-start justify-center gap-5">
+  <!-- <div class="flex flex-col items-start justify-center gap-5">
     <h2 class="text-lg">Device Connection Demo</h2>
     <p>
       With the ODD SDK, a user’s account lives only on their connected devices —
@@ -29,5 +29,5 @@
     <button class="btn btn-primary" on:click={() => goto('/delegate-account')}>
       Connect an additional device
     </button>
-  </div>
+  </div> -->
 </div>
