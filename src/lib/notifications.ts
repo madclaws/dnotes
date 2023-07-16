@@ -3,7 +3,7 @@ import { notificationStore } from '../stores'
 export type Notification = {
   id?: string
   msg?: string
-  type?: NotificationType 
+  type?: NotificationType
   timeout?: number
 }
 
@@ -30,7 +30,7 @@ export const addNotification: (
       id,
       msg,
       type,
-      timeout,
+      timeout
     }
   ])
 

@@ -6,7 +6,11 @@ import type { CID } from 'multiformats/cid'
 import type { PuttableUnixTree, File as WNFile } from '@oddjs/odd/fs/types'
 import type { Metadata } from '@oddjs/odd/fs/metadata'
 
-import { accountSettingsStore, filesystemStore, sessionStore } from '$src/stores'
+import {
+  accountSettingsStore,
+  filesystemStore,
+  sessionStore
+} from '$src/stores'
 import { addNotification } from '$lib/notifications'
 import { fileToUint8Array } from './utils'
 
@@ -32,8 +36,14 @@ interface AvatarFile extends PuttableUnixTree, WNFile {
 }
 
 export const ACCOUNT_SETTINGS_DIR = odd.path.directory('private', 'settings')
-const AVATAR_DIR = odd.path.combine(ACCOUNT_SETTINGS_DIR, odd.path.directory('avatars'))
-const AVATAR_ARCHIVE_DIR = odd.path.combine(AVATAR_DIR, odd.path.directory('archive'))
+const AVATAR_DIR = odd.path.combine(
+  ACCOUNT_SETTINGS_DIR,
+  odd.path.directory('avatars')
+)
+const AVATAR_ARCHIVE_DIR = odd.path.combine(
+  AVATAR_DIR,
+  odd.path.directory('archive')
+)
 const AVATAR_FILE_NAME = 'avatar'
 const FILE_SIZE_LIMIT = 20
 
@@ -54,13 +64,20 @@ const archiveOldAvatar = async (): Promise<void> => {
   const oldAvatarFileName = Object.keys(links).find(key =>
     key.includes(AVATAR_FILE_NAME)
   )
-  const oldFileNameArray = oldAvatarFileName.split('.')[ 0 ]
-  const archiveFileName = `${oldFileNameArray[ 0 ]}-${Date.now()}.${oldFileNameArray[ 1 ]
-    }`
+  const oldFileNameArray = oldAvatarFileName.split('.')[0]
+  const archiveFileName = `${oldFileNameArray[0]}-${Date.now()}.${
+    oldFileNameArray[1]
+  }`
 
   // Move old avatar to archive dir
-  const fromPath = odd.path.combine(AVATAR_DIR, odd.path.file(oldAvatarFileName))
-  const toPath = odd.path.combine(AVATAR_ARCHIVE_DIR, odd.path.file(archiveFileName))
+  const fromPath = odd.path.combine(
+    AVATAR_DIR,
+    odd.path.file(oldAvatarFileName)
+  )
+  const toPath = odd.path.combine(
+    AVATAR_ARCHIVE_DIR,
+    odd.path.file(archiveFileName)
+  )
   await fs.mv(fromPath, toPath)
 
   // Announce the changes to the server
@@ -102,7 +119,9 @@ export const getAvatarFromWNFS = async (): Promise<void> => {
       return
     }
 
-    const file = await fs.get(odd.path.combine(AVATAR_DIR, odd.path.file(`${avatarName}`)))
+    const file = await fs.get(
+      odd.path.combine(AVATAR_DIR, odd.path.file(`${avatarName}`))
+    )
 
     // The CID for private files is currently located in `file.header.content`
     const cid = (file as AvatarFile).header.content.toString()
@@ -158,8 +177,8 @@ export const uploadAvatarToWNFS = async (image: File): Promise<void> => {
 
     // Rename the file to `avatar.[extension]`
     const updatedImage = new File(
-      [ image ],
-      `${AVATAR_FILE_NAME}.${image.name.split('.')[ 1 ]}`,
+      [image],
+      `${AVATAR_FILE_NAME}.${image.name.split('.')[1]}`,
       {
         type: image.type
       }
@@ -186,11 +205,7 @@ export const generateRecoveryKit = async (): Promise<string> => {
     program: {
       components: { crypto, reference }
     },
-    username: {
-      full,
-      hashed,
-      trimmed,
-    }
+    username: { full, hashed, trimmed }
   } = getStore(sessionStore)
 
   // Get the user's read-key and base64 encode it

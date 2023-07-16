@@ -26,17 +26,12 @@ export const isUsernameValid = async (username: string): Promise<boolean> => {
   return session.authStrategy.isUsernameValid(username)
 }
 
-const _isUsernameAvailable = async (
-  username: string
-) => {
+const _isUsernameAvailable = async (username: string) => {
   const session = getStore(sessionStore)
   return session.authStrategy.isUsernameAvailable(username)
 }
 
-const debouncedIsUsernameAvailable = asyncDebounce(
-  _isUsernameAvailable,
-  300
-)
+const debouncedIsUsernameAvailable = asyncDebounce(_isUsernameAvailable, 300)
 
 export const isUsernameAvailable = async (
   username: string
@@ -44,7 +39,9 @@ export const isUsernameAvailable = async (
   return debouncedIsUsernameAvailable(username)
 }
 
-export const createDID = async (crypto: Crypto.Implementation): Promise<string> => {
+export const createDID = async (
+  crypto: Crypto.Implementation
+): Promise<string> => {
   const pubKey = await crypto.keystore.publicExchangeKey()
   const ksAlg = await crypto.keystore.getAlgorithm()
 
@@ -57,13 +54,16 @@ export const prepareUsername = async (username: string): Promise<string> => {
     new TextEncoder().encode(normalizedUsername)
   )
 
-  return uint8arrays
-    .toString(hashedUsername, 'base32')
-    .slice(0, 32)
+  return uint8arrays.toString(hashedUsername, 'base32').slice(0, 32)
 }
 
 export const register = async (hashedUsername: string): Promise<boolean> => {
-  const { authStrategy, program: { components: { storage } } } = getStore(sessionStore)
+  const {
+    authStrategy,
+    program: {
+      components: { storage }
+    }
+  } = getStore(sessionStore)
 
   const { success } = await authStrategy.register({ username: hashedUsername })
 
@@ -75,14 +75,14 @@ export const register = async (hashedUsername: string): Promise<boolean> => {
   // TODO Remove if only public and private directories are needed
   await initializeFilesystem(session.fs)
 
-  const fullUsername = await storage.getItem(USERNAME_STORAGE_KEY) as string
+  const fullUsername = (await storage.getItem(USERNAME_STORAGE_KEY)) as string
 
   sessionStore.update(state => ({
     ...state,
     username: {
       full: fullUsername,
       hashed: hashedUsername,
-      trimmed: fullUsername.split('#')[ 0 ]
+      trimmed: fullUsername.split('#')[0]
     },
     session
   }))
@@ -101,8 +101,16 @@ const initializeFilesystem = async (fs: FileSystem): Promise<void> => {
   await fs.mkdir(ACCOUNT_SETTINGS_DIR)
 }
 
-export const loadAccount = async (hashedUsername: string, fullUsername: string): Promise<void> => {
-  const { authStrategy, program: { components: { storage } } } = getStore(sessionStore)
+export const loadAccount = async (
+  hashedUsername: string,
+  fullUsername: string
+): Promise<void> => {
+  const {
+    authStrategy,
+    program: {
+      components: { storage }
+    }
+  } = getStore(sessionStore)
   const session = await authStrategy.session()
 
   filesystemStore.set(session.fs)
@@ -116,7 +124,7 @@ export const loadAccount = async (hashedUsername: string, fullUsername: string):
     username: {
       full: fullUsername,
       hashed: hashedUsername,
-      trimmed: fullUsername.split('#')[ 0 ],
+      trimmed: fullUsername.split('#')[0]
     },
     session,
     backupCreated: backupStatus.created

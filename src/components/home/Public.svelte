@@ -11,9 +11,7 @@
   <h1 class="text-xl">Welcome to {appName}</h1>
 
   <div class="max-w-[590px]">
-    <p class="mb-5">
-      A local-first decentralized note taking app
-    </p>
+    <p class="mb-5">A local-first decentralized note taking app</p>
 
     <!-- <ul class="mb-6 pl-6 list-disc">
       <li>

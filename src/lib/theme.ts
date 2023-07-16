@@ -15,20 +15,22 @@ export const getSystemDefaultTheme = (): ThemeOptions =>
 
 export const loadTheme = (): Theme => {
   if (browser) {
-    const useDefault = localStorage.getItem(DEFAULT_THEME_KEY) !== 'undefined' && JSON.parse(localStorage.getItem(DEFAULT_THEME_KEY))
+    const useDefault =
+      localStorage.getItem(DEFAULT_THEME_KEY) !== 'undefined' &&
+      JSON.parse(localStorage.getItem(DEFAULT_THEME_KEY))
     const browserTheme = localStorage.getItem(THEME_KEY) as ThemeOptions
     const osTheme = getSystemDefaultTheme()
 
     if (useDefault) {
       return {
         selectedTheme: getSystemDefaultTheme(),
-        useDefault,
+        useDefault
       }
     }
 
     return {
       selectedTheme: browserTheme ?? (osTheme as ThemeOptions) ?? 'light',
-      useDefault,
+      useDefault
     }
   }
 }

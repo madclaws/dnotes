@@ -13,7 +13,7 @@ module.exports = {
     {
       files: '*.md',
       options: {
-        tabWidth: 4,
+        tabWidth: 4
       }
     }
   ]

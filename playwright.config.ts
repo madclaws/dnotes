@@ -1,5 +1,5 @@
-import type { PlaywrightTestConfig } from '@playwright/test';
-import { devices } from '@playwright/test';
+import type { PlaywrightTestConfig } from '@playwright/test'
+import { devices } from '@playwright/test'
 
 /**
  * Read environment variables from file.
@@ -69,15 +69,15 @@ const config: PlaywrightTestConfig = {
     {
       name: 'Mobile Chrome',
       use: {
-        ...devices['Pixel 5'],
-      },
+        ...devices['Pixel 5']
+      }
     },
     {
       name: 'Mobile Safari',
       use: {
-        ...devices['iPhone 12'],
-      },
-    },
+        ...devices['iPhone 12']
+      }
+    }
   ],
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
@@ -90,4 +90,4 @@ const config: PlaywrightTestConfig = {
   }
 }
 
-export default config;
+export default config

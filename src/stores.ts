@@ -25,5 +25,5 @@ export const notificationStore: Writable<Notification[]> = writable([])
 
 export const accountSettingsStore: Writable<AccountSettings> = writable({
   avatar: null,
-  loading: true,
+  loading: true
 })
