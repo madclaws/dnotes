@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { galleryStore } from '$routes/gallery/stores'
-  import { handleFileInput } from '$routes/gallery/lib/gallery'
-  import FileUploadIcon from '$routes/gallery/components/icons/FileUploadIcon.svelte'
+  import { galleryStore } from '$routes/notes/stores'
+  import { handleFileInput } from '$routes/notes/lib/gallery'
+  import FileUploadIcon from '$routes/notes/components/icons/FileUploadIcon.svelte'
 
   // Handle files uploaded directly through the file input
   let files: FileList

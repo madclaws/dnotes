@@ -18,7 +18,7 @@
     },
     {
       label: 'Notes',
-      href: '/gallery/',
+      href: '/notes/',
       icon: PhotoGallery
     },
     {

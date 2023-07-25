@@ -2,16 +2,16 @@
   import { onDestroy } from 'svelte'
 
   import { filesystemStore, sessionStore } from '$src/stores'
-  import { AREAS, galleryStore } from '$routes/gallery/stores'
-  import {getImagesFromWNFS, type Image}  from '$routes/gallery/lib/gallery'
-  import FileUploadCard from '$routes/gallery/components/upload/FileUploadCard.svelte'
-  import ImageCard from '$routes/gallery/components/imageGallery/ImageCard.svelte'
-  import ImageModal from '$routes/gallery/components/imageGallery/ImageModal.svelte'
+  import { AREAS, galleryStore } from '$routes/notes/stores'
+  import {getImagesFromWNFS, type Image}  from '$routes/notes/lib/gallery'
+  import FileUploadCard from '$routes/notes/components/upload/FileUploadCard.svelte'
+  import ImageCard from '$routes/notes/components/imageGallery/ImageCard.svelte'
+  import ImageModal from '$routes/notes/components/imageGallery/ImageModal.svelte'
 
-  import Note from '$routes/gallery/components/Note.svelte'
-  import EditNoteModal from '$routes/gallery/components/EditNoteModal.svelte'
-  import DeleteNoteModal from '$routes/gallery/components/DeleteNoteModal.svelte'
-  import type { NoteType } from '$routes/gallery/lib/utils'
+  import Note from '$routes/notes/components/Note.svelte'
+  import EditNoteModal from '$routes/notes/components/EditNoteModal.svelte'
+  import DeleteNoteModal from '$routes/notes/components/DeleteNoteModal.svelte'
+  import type { NoteType } from '$routes/notes/lib/utils'
   import Fa from 'svelte-fa/src/fa.svelte'
   import { faPlus } from '@fortawesome/free-solid-svg-icons'
   import Modal from '$routes/notes/components/Modal.svelte'
@@ -192,7 +192,14 @@ const deleteNote  = (event: CustomEvent) => {
     on:delete="{openDeleteNote}"
     on:close="{closeEditModal}"
   />
-  <!-- <Modal/> -->
+{/if}
+
+{#if showDeleteModal}
+  <DeleteNoteModal
+    {...noteToDelete}
+    on:delete="{deleteNote}"
+    on:close="{closeDeleteModal}"
+  />
 {/if}
 </section>
 

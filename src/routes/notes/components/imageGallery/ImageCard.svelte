@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Image } from '$routes/gallery/lib/gallery'
+  import type { Image } from '$routes/notes/lib/gallery'
 
   export let image: Image
   export let openModal: (image: Image) => void

@@ -1,187 +1,52 @@
 <script lang="ts">
-  import Note from '$routes/notes/components/Note.svelte'
-  import EditNoteModal from '$routes/notes/components/EditNoteModal.svelte'
-  import DeleteNoteModal from '$routes/notes/components/DeleteNoteModal.svelte'
-  import Modal from './components/Modal.svelte'
-  import type { NoteType } from '$routes/notes/libs/utils'
-  import Fa from 'svelte-fa/src/fa.svelte'
-  import { faPlus } from '@fortawesome/free-solid-svg-icons'
+  import { onDestroy } from 'svelte'
+  import { goto } from '$app/navigation'
 
-  let notesJSONString: string = localStorage.getItem('notes')
+  import { sessionStore } from '$src/stores'
+  import { AREAS, galleryStore } from '$routes/notes/stores'
+  import Dropzone from '$routes/notes/components/upload/Dropzone.svelte'
+  import ImageGallery from '$routes/notes/components/imageGallery/ImageGallery.svelte'
 
-  let notes: Array<NoteType> = []
+  /**
+   * Tab between the public/private areas and load associated images
+   * @param area
+   */
+  const handleChangeTab: (area: AREAS) => void = area =>
+    galleryStore.update(store => ({
+      ...store,
+      selectedArea: area
+    }))
 
-  if (notesJSONString) {
-    try {
-      notes = JSON.parse(notesJSONString) as NoteType[]
-    } catch (err) {
-      console.error(err)
+  // If the user is not authed redirect them to the home page
+  const unsubscribe = sessionStore.subscribe(newState => {
+    if (!newState.loading && !newState.session) {
+      goto('/')
     }
-  } else {
-    notes = [
-      {
-        id: 1,
-        title: 'Some Note',
-        content: 'This note is about this and that',
-        date: '20210806123021',
-        isFavorite: false,
-        tags: ['test', 'text']
-      },
-      {
-        id: 2,
-        title: 'Another Note',
-        content: 'This is yet another note about this and that',
-        date: '20210806133021',
-        isFavorite: false,
-        tags: ['test', 'text', 'extra']
-      },
-      {
-        id: 3,
-        title: 'Lorem ipsum',
-        content:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi in bibendum tellus. Aenean bibendum purus id turpis hendrerit tristique vitae nec lacus. Nam viverra elementum nisl. Donec non tempus arcu. Etiam iaculis ex nec hendrerit tincidunt. Vivamus elementum velit dui, non hendrerit purus condimentum ut. In convallis mauris eget consequat tempus. Pellentesque auctor a massa ac suscipit. Donec id metus suscipit, interdum tortor at, semper massa. Donec eget finibus purus, sed varius mi. Etiam a dui eget tortor auctor pulvinar eu ac lectus. Duis non diam molestie, efficitur massa non, suscipit massa. Etiam dictum eros quis ullamcorper scelerisque. Donec fermentum id ipsum vitae ullamcorper. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Cras pharetra diam sed fringilla dictum.',
-        date: '20210804133021',
-        isFavorite: true,
-        tags: ['Lorem', 'ipsum']
-      }
-    ]
-  }
+  })
 
-  // editing
-
-  let noteToEdit: NoteType | Record<string, unknown> | undefined
-  let showEditModal = false
-
-  const openEditNote = (note?: NoteType) => {
-    noteToEdit = {}
-    if (note) {
-      noteToEdit = note
-    }
-    showEditModal = true
-    console.log("noteToEdit", noteToEdit);
-    console.log("showEditModal", showEditModal);
-  }
-
-  const closeEditModal = () => {
-    noteToEdit = {}
-    showEditModal = false
-  }
-
-  let noteToDelete: NoteType | Record<string, unknown> | undefined
-  let showDeleteModal = false
-
-  const openDeleteNote = (event: CustomEvent) => {
-    const deleteNoteIndex = event.detail as number
-    const noteIndex = notes.findIndex(item => item.id === deleteNoteIndex)
-    if (noteIndex !== -1) {
-      noteToDelete = notes[noteIndex]
-      showDeleteModal = true
-    }
-  }
-
-  const closeDeleteModal = () => {
-    noteToDelete = {}
-    showDeleteModal = false
-  }
-
-  const saveNotesToStorage = () => {
-    // for reactivity purposes
-    notes = notes
-    // save it in the local storage
-    localStorage.setItem('notes', JSON.stringify(notes))
-  }
-
-  const toggleFavorite = (event: CustomEvent) => {
-    const noteId: number = (event.detail as number)
-    const note = notes.find(item => item.id === noteId)
-    if (note) {
-      note.isFavorite = !note.isFavorite
-      saveNotesToStorage()
-    }
-  }
-
-  const saveNote = (event: CustomEvent) => {
-    closeEditModal()
-    const note = event.detail as NoteType
-    const noteIndex = notes.findIndex(item => item.id === note.id)
-    
-    if (noteIndex !== -1) {
-      notes[noteIndex] = note    
-    } else {
-      notes.push(note)
-    }
-    saveNotesToStorage()
-  }
-
-  const deleteNote  = (event: CustomEvent) => {
-    closeDeleteModal()
-    closeEditModal()
-    const deleteNoteIndex = event.detail as number
-    const noteIndex = notes.findIndex(item => item.id === deleteNoteIndex)
-    
-    if (noteIndex !== -1) {
-      notes.splice(noteIndex, 1)
-    }
-    console.log(notes)
-    saveNotesToStorage()
-  }
+  onDestroy(unsubscribe)
 </script>
 
-<main>
-  <div class="note-card-container">
-    <div class="note-card-add" on:click="{() => { openEditNote() }}">
-      <Fa icon={faPlus} color="#afaeae" size="3x" />
+<div class="p-2 mb-14 text-center">
+  {#if $sessionStore.session}
+    <div class="flex items-center justify-center translate-y-1/2 w-fit m-auto">
+      <div class="tabs border-2 overflow-hidden border-base-content rounded-lg">
+        {#each Object.keys(AREAS) as area}
+          <button
+            on:click={() => handleChangeTab(AREAS[area])}
+            class="tab h-10 font-bold text-sm ease-in {$galleryStore.selectedArea ===
+            AREAS[area]
+              ? 'tab-active bg-base-content text-base-100'
+              : 'bg-base-100 text-base-content'}"
+          >
+            {AREAS[area]} Notes
+          </button>
+        {/each}
+      </div>
     </div>
 
-    {#each notes as note (note.id)}
-      <Note
-        {...note}
-        on:click="{() => { openEditNote(note) }}"
-        on:toggleFavorite="{toggleFavorite}"
-      />
-    {/each}
-  </div>
-
-  {#if showEditModal}
-  <EditNoteModal
-    {...noteToEdit}
-    on:save="{saveNote}"
-    on:delete="{openDeleteNote}"
-    on:close="{closeEditModal}"
-  />
-{/if}
-</main>
-
-<!-- <Modal/> -->
-
-<style lang="scss">
-  main {
-    padding: 2em;
-    margin: 0 auto;
-    width: 100vw;
-    box-sizing: border-box;
-  }
-
-  .note-card {
-    &-add {
-      background-color: #d6d4d4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: none;
-      border: 4px dashed #a29f9f;
-      width: 144px;
-      height: 189px;
-      color: #a29f9f;
-      margin-right: 15px;
-      padding: 15px;
-      border-radius: 10px;
-      &:hover {
-        background-color: #c5c5c5;
-      }
-    }
-    &-container {
-      display: flex;
-    }
-  }
-</style>
+    <Dropzone>
+      <ImageGallery />
+    </Dropzone>
+  {/if}
+</div>

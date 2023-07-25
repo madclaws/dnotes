@@ -5,7 +5,7 @@ import type PrivateFile from '@oddjs/odd/fs/v1/PrivateFile'
 import { isFile } from '@oddjs/odd/fs/types/check'
 
 import { filesystemStore } from '$src/stores'
-import { AREAS, galleryStore } from '$routes/gallery/stores'
+import { AREAS, galleryStore } from '$routes/notes/stores'
 import { addNotification } from '$lib/notifications'
 import { fileToUint8Array } from '$lib/utils'
 
@@ -30,8 +30,8 @@ type Link = {
 }
 
 export const GALLERY_DIRS = {
-  [AREAS.PUBLIC]: odd.path.directory('public', 'gallery'),
-  [AREAS.PRIVATE]: odd.path.directory('private', 'gallery')
+  [AREAS.PUBLIC]: odd.path.directory('public', 'notes'),
+  [AREAS.PRIVATE]: odd.path.directory('private', 'notes')
 }
 const FILE_SIZE_LIMIT = 20
 

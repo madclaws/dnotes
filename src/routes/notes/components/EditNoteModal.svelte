@@ -2,7 +2,7 @@
   import moment from 'moment'
   import { createEventDispatcher, onMount } from 'svelte'
   import Modal from '$routes/notes/components/Modal.svelte'
-  import { formatDate } from '$routes/notes/libs/utils'
+  import { formatDate } from '$routes/notes/lib/utils'
 
   // ---------------------------------------------------------
   //  Props
@@ -11,7 +11,7 @@
   export let title: string | undefined = undefined
   export let date: string | undefined = undefined
   export let content: string | undefined = undefined
-  export let isFavorite: boolean | undefined = undefined
+  export let isFavorite: boolean  = false
   export let tags: string[] | undefined = undefined
 
   let tagString = tags && tags.length ? tags.join(',') : ''
@@ -119,6 +119,7 @@
         height: 30px;
         border-radius: 5px;
         border: 1px solid #c3c3c3;
+        background-color: #fff;
       }
       .text {
         height: 30px;
