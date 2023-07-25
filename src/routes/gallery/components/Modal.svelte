@@ -14,9 +14,9 @@
     const dispatch = createEventDispatcher();
   </script>
   
-  <div class="modalx-overlay">
-    <div class="modalx">
-      <div class="modalx-header">
+  <div class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
         <slot name="title"></slot>
         <div class="close-icon" on:click="{() => dispatch('closeModal')}">
           <Fa icon={faTimes} color="#afaeae" size="1x" />
@@ -30,7 +30,7 @@
   </div>
   
   <style lang="scss">
-    .modalx {
+    .modal {
     background-color: white;
     padding: 15px 0;
     border-radius: 10px;

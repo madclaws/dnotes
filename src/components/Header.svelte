@@ -67,7 +67,7 @@
       </a>
     {/if}
 
-    <span class="ml-2 cursor-pointer">
+    <!-- <span class="ml-2 cursor-pointer">
       {#if $themeStore.selectedTheme === 'light'}
         <span on:click={() => setTheme('dark')}>
           <LightMode />
@@ -77,6 +77,6 @@
           <DarkMode />
         </span>
       {/if}
-    </span>
+    </span> -->
   </div>
 </header>

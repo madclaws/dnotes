@@ -128,7 +128,7 @@
 </script>
 
 <main>
-  <!-- <div class="note-card-container">
+  <div class="note-card-container">
     <div class="note-card-add" on:click="{() => { openEditNote() }}">
       <Fa icon={faPlus} color="#afaeae" size="3x" />
     </div>
@@ -140,19 +140,19 @@
         on:toggleFavorite="{toggleFavorite}"
       />
     {/each}
-  </div> -->
-<Modal/>
-  <!-- {#if showEditModal}
+  </div>
+
+  {#if showEditModal}
   <EditNoteModal
     {...noteToEdit}
     on:save="{saveNote}"
     on:delete="{openDeleteNote}"
     on:close="{closeEditModal}"
   />
-{/if} -->
+{/if}
 </main>
 
-
+<!-- <Modal/> -->
 
 <style lang="scss">
   main {
