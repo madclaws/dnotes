@@ -5,9 +5,10 @@ import type PrivateFile from '@oddjs/odd/fs/v1/PrivateFile'
 import { isFile } from '@oddjs/odd/fs/types/check'
 
 import { filesystemStore } from '$src/stores'
-import { AREAS, galleryStore } from '$routes/notes/stores'
+import { AREAS, galleryStore, noteSpaceStore } from '$routes/notes/stores'
 import { addNotification } from '$lib/notifications'
 import { fileToUint8Array } from '$lib/utils'
+import type { NoteType } from './utils'
 
 export type Image = {
   cid: string
@@ -18,9 +19,25 @@ export type Image = {
   src: string
 }
 
+export interface Note {
+  cid: string
+  ctime: number
+  name: string
+  private: boolean
+  size: number
+  src: any
+}
+
 export type Gallery = {
   publicImages: Image[] | null
   privateImages: Image[] | null
+  selectedArea: AREAS
+  loading: boolean
+}
+
+export type NoteSpace = {
+  publicNotes: Note[] | null
+  privateNotes: Image[] | null
   selectedArea: AREAS
   loading: boolean
 }
@@ -113,6 +130,85 @@ export const getImagesFromWNFS: () => Promise<void> = async () => {
 }
 
 /**
+ * Get notes from the user's WNFS and construct the notes
+ */
+export const getNotesFromWNFS: () => Promise<void> = async () => {
+  try {
+    // Set loading: true on the galleryStore
+    noteSpaceStore.update(store => ({ ...store, loading: true }))
+
+    const { selectedArea } = getStore(noteSpaceStore)
+    const isPrivate = selectedArea === AREAS.PRIVATE
+    const fs = getStore(filesystemStore)
+
+    // Set path to either private or public gallery dir
+    const path = GALLERY_DIRS[selectedArea]
+
+    // Get list of links for files in the gallery dir
+    const links = await fs.ls(path)
+    
+
+    let notes = await Promise.all(
+      Object.entries(links).map(async ([name]) => {
+        const file = await fs.get(
+          odd.path.combine(GALLERY_DIRS[selectedArea], odd.path.file(`${name}`))
+        )
+
+        if (!isFile(file)) return null
+
+        // The CID for private files is currently located in `file.header.content`,
+        // whereas the CID for public files is located in `file.cid`
+        const cid = isPrivate
+          ? (file as PrivateFile).header.content.toString()
+          : (file as PublicFile).cid.toString()
+
+        // console.log(file.content);
+        // Create a blob to use as the image `src`
+        // const blob = new Blob([file.content])
+        const src = JSON.parse(new TextDecoder().decode(file.content));
+
+        const ctime = isPrivate
+          ? (file as PrivateFile).header.metadata.unixMeta.ctime
+          : (file as PublicFile).header.metadata.unixMeta.ctime
+        
+        return {
+          cid,
+          ctime,
+          name,
+          private: isPrivate,
+          size: (links[name] as Link).size,
+          src
+        }
+      })
+    )
+
+    // Sort notes by ctime(created at date)
+    // NOTE: this will eventually be controlled via the UI
+    notes = notes.filter(a => !!a)
+    notes.sort((a, b) => b.ctime - a.ctime)
+    
+    // Push images to the noteSpaceStore
+    noteSpaceStore.update(store => ({
+      ...store,
+      ...(isPrivate
+        ? {
+            privateNotes: notes
+          }
+        : {
+            publicNotes: notes
+          }),
+      loading: false
+    }))
+  } catch (error) {
+    console.error(error)
+    noteSpaceStore.update(store => ({
+      ...store,
+      loading: false
+    }))
+  }
+}
+
+/**
  * Upload an image to the user's private or public WNFS
  * @param image
  */
@@ -154,6 +250,51 @@ export const uploadImageToWNFS: (
 }
 
 /**
+ * Upload a note to the user's private or public WNFS
+ * @param note
+ */
+export const uploadNoteToWNFS: (
+  note: NoteType
+) => Promise<void> = async note => {
+  try {
+    const { selectedArea } = getStore(noteSpaceStore)
+    const fs = getStore(filesystemStore)
+
+    // convert NoteType into JS File object
+    let noteBlob = new Blob([JSON.stringify(note)], {type: "application/json"});
+    let noteFile = new File([noteBlob], note.title, {type: "application/json"});
+    
+    // Reject files over 20MB
+    const fileSizeinMB = noteFile.size / (1024 * 1024)
+    if (fileSizeinMB > FILE_SIZE_LIMIT) {
+      throw new Error('Note can be no larger than 20MB')
+    }
+
+    // Reject the upload if the note already exists in the directory
+    const fileExists = await fs.exists(
+      odd.path.combine(GALLERY_DIRS[selectedArea], odd.path.file(noteFile.name))
+    )
+    if (fileExists) {
+      throw new Error(`${noteFile.name} note already exists`)
+    }
+
+    // Create a sub directory and add some content
+    await fs.write(
+      odd.path.combine(GALLERY_DIRS[selectedArea], odd.path.file(noteFile.name)),
+      await fileToUint8Array(noteFile)
+    )
+
+    // Announce the changes to the server
+    await fs.publish()
+
+    addNotification(`${noteFile.name} note has been published`, 'success')
+  } catch (error) {
+    addNotification(error.message, 'error')
+    console.error(error)
+  }
+}
+
+/**
  * Delete an image from the user's private or public WNFS
  * @param name
  */
@@ -183,6 +324,43 @@ export const deleteImageFromWNFS: (
       await getImagesFromWNFS()
     } else {
       throw new Error(`${name} image has already been deleted`)
+    }
+  } catch (error) {
+    addNotification(error.message, 'error')
+    console.error(error)
+  }
+}
+
+/**
+ * Delete a note from the user's private or public WNFS
+ * @param name
+ */
+export const deleteNoteFromWNFS: (
+  name: string
+) => Promise<void> = async name => {
+  try {
+    const { selectedArea } = getStore(noteSpaceStore)
+    const fs = getStore(filesystemStore)
+
+    const noteExists = await fs.exists(
+      odd.path.combine(GALLERY_DIRS[selectedArea], odd.path.file(name))
+    )
+
+    if (noteExists) {
+      // Remove notes
+      await fs.rm(
+        odd.path.combine(GALLERY_DIRS[selectedArea], odd.path.file(name))
+      )
+
+      // Announce the changes to the server
+      await fs.publish()
+
+      addNotification(`${name} note has been deleted`, 'success')
+
+      // Refetch notes and update noteSpaceStore
+      await getNotesFromWNFS()
+    } else {
+      throw new Error(`${name} note has already been deleted`)
     }
   } catch (error) {
     addNotification(error.message, 'error')

@@ -2,8 +2,8 @@
   import { onDestroy } from 'svelte'
 
   import { filesystemStore, sessionStore } from '$src/stores'
-  import { AREAS, galleryStore } from '$routes/notes/stores'
-  import {getImagesFromWNFS, type Image}  from '$routes/notes/lib/gallery'
+  import { AREAS, galleryStore, noteSpaceStore } from '$routes/notes/stores'
+  import {getImagesFromWNFS, uploadNoteToWNFS, type Image, getNotesFromWNFS, deleteNoteFromWNFS}  from '$routes/notes/lib/gallery'
   import FileUploadCard from '$routes/notes/components/upload/FileUploadCard.svelte'
   import ImageCard from '$routes/notes/components/imageGallery/ImageCard.svelte'
   import ImageModal from '$routes/notes/components/imageGallery/ImageModal.svelte'
@@ -28,7 +28,7 @@
 
   // If galleryStore.selectedArea changes from private to public, re-run getImagesFromWNFS
   let selectedArea = null
-  const unsubscribeGalleryStore = galleryStore.subscribe(async updatedStore => {
+  const unsubscribeGalleryStore = noteSpaceStore.subscribe(async updatedStore => {
     // Get initial selectedArea
     if (!selectedArea) {
       selectedArea = updatedStore.selectedArea
@@ -36,7 +36,7 @@
 
     if (selectedArea !== updatedStore.selectedArea) {
       selectedArea = updatedStore.selectedArea
-      // await getImagesFromWNFS()
+      await getNotesFromWNFS()
     }
   })
 
@@ -47,9 +47,10 @@
     if (newState.session && $filesystemStore && !imagesFetched) {
       imagesFetched = true
       // Get images from the user's public WNFS
-      if (nope) {
-        getImagesFromWNFS()
-      }
+      // if (nope) {
+        // getImagesFromWNFS()
+        getNotesFromWNFS();
+      // }
     }
   })
 
@@ -81,8 +82,6 @@ const openEditNote = (note?: NoteType) => {
     noteToEdit = note
   }
   showEditModal = true
-  console.log("noteToEdit", noteToEdit);
-  console.log("showEditModal", showEditModal);
 }
 
 const closeEditModal = () => {
@@ -95,9 +94,11 @@ let showDeleteModal = false
 
 const openDeleteNote = (event: CustomEvent) => {
   const deleteNoteIndex = event.detail as number
-  const noteIndex = notes.findIndex(item => item.id === deleteNoteIndex)
+  console.log(event)
+  // harcoding public notes here, change later
+  const noteIndex = $noteSpaceStore.publicNotes.findIndex(item => item.src.id === deleteNoteIndex)
   if (noteIndex !== -1) {
-    noteToDelete = notes[noteIndex]
+    noteToDelete = $noteSpaceStore.publicNotes[noteIndex].src
     showDeleteModal = true
   }
 }
@@ -123,7 +124,7 @@ const toggleFavorite = (event: CustomEvent) => {
   }
 }
 
-const saveNote = (event: CustomEvent) => {
+const saveNote = async (event: CustomEvent) => {
   closeEditModal()
   const note = event.detail as NoteType
   const noteIndex = notes.findIndex(item => item.id === note.id)
@@ -133,20 +134,21 @@ const saveNote = (event: CustomEvent) => {
   } else {
     notes.push(note)
   }
-  saveNotesToStorage()
+  await uploadNoteToWNFS(note);
+  // saveNotesToStorage()
 }
 
 const deleteNote  = (event: CustomEvent) => {
   closeDeleteModal()
   closeEditModal()
   const deleteNoteIndex = event.detail as number
-  const noteIndex = notes.findIndex(item => item.id === deleteNoteIndex)
+  // harcoding public notes here, change later
+  const noteIndex = $noteSpaceStore.publicNotes.findIndex(item => item.src.id === deleteNoteIndex)
   
   if (noteIndex !== -1) {
-    notes.splice(noteIndex, 1)
+    deleteNoteFromWNFS($noteSpaceStore.publicNotes[noteIndex].src.title);
   }
-  console.log(notes)
-  saveNotesToStorage()
+  // saveNotesToStorage()
 }
 </script>
 
@@ -156,15 +158,23 @@ const deleteNote  = (event: CustomEvent) => {
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:lg:grid-cols-6 gap-4"
     >
       <!-- <FileUploadCard />
-      {#each $galleryStore.selectedArea === AREAS.PRIVATE ? $galleryStore.privateImages : $galleryStore.publicImages as image}
+      {#each $noteSpaceStore.selectedArea === AREAS.PRIVATE ? $noteSpaceStore.privateNotes : $noteSpaceStore.publicNotes }
         <ImageCard {image} openModal={setSelectedImage} />
       {/each} -->
       <!-- <div class="note-card-container"> -->
         <div class="note-card-add" on:click="{() => { openEditNote() }}">
           <Fa icon={faPlus} color="#afaeae" size="3x" />
         </div>
-        <!-- {console.log(notes)} -->
-        {#if notes.length > 0}
+          {#each $noteSpaceStore.selectedArea === AREAS.PRIVATE ? $noteSpaceStore.privateNotes : $noteSpaceStore.publicNotes as note (note.cid) }
+            <Note
+            {...note.src}
+            on:click="{() => { openEditNote(note.src)}}"
+            on:toggleFavorite="{toggleFavorite}"
+          />
+          {/each}
+         
+    
+        <!-- {#if notes.length > 0}
         {#each notes as note (note.id)}
           <Note
             {...note}
@@ -172,7 +182,7 @@ const deleteNote  = (event: CustomEvent) => {
             on:toggleFavorite="{toggleFavorite}"
           />
         {/each}
-        {/if}
+        {/if} -->
       <!-- </div> -->
     </div>
   </div>
@@ -195,6 +205,7 @@ const deleteNote  = (event: CustomEvent) => {
 {/if}
 
 {#if showDeleteModal}
+  {console.log(showDeleteModal)}
   <DeleteNoteModal
     {...noteToDelete}
     on:delete="{deleteNote}"

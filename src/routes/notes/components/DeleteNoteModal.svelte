@@ -4,17 +4,17 @@
 
   export let id: number | undefined = undefined
   export let title: string | undefined = undefined
-
+  console.log(id);
   const dispatch = createEventDispatcher()
 </script>
 
 <Modal on:closeModal={() => dispatch('close')}>
   <div slot="title" class="title">Confirm Delete</div>
-  <div slot="body" class="modal-body">
+  <div slot="body" class="modalx-body">
     Are you sure you want to delete "{title}" ?
   </div>
 
-  <div slot="footer" class="modal-footer">
+  <div slot="footer" class="modalx-footer">
     <button
       class="button delete"
       on:click|stopPropagation={() => dispatch('delete', id)}
@@ -28,7 +28,7 @@
 </Modal>
 
 <style lang="scss">
-  .modal {
+  .modalx {
     &-body {
       padding: 30px 15px;
       width: 330px;
