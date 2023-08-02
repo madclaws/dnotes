@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation'
 
   import { sessionStore } from '$src/stores'
-  import { AREAS, galleryStore } from '$routes/notes/stores'
+  import { AREAS, galleryStore, noteSpaceStore } from '$routes/notes/stores'
   import Dropzone from '$routes/notes/components/upload/Dropzone.svelte'
   import ImageGallery from '$routes/notes/components/imageGallery/ImageGallery.svelte'
 
@@ -12,11 +12,11 @@
    * @param area
    */
   const handleChangeTab: (area: AREAS) => void = area =>
-    galleryStore.update(store => ({
+    noteSpaceStore.update(store => ({
       ...store,
       selectedArea: area
     }))
-
+    
   // If the user is not authed redirect them to the home page
   const unsubscribe = sessionStore.subscribe(newState => {
     if (!newState.loading && !newState.session) {
@@ -34,7 +34,7 @@
         {#each Object.keys(AREAS) as area}
           <button
             on:click={() => handleChangeTab(AREAS[area])}
-            class="tab h-10 font-bold text-sm ease-in {$galleryStore.selectedArea ===
+            class="tab h-10 font-bold text-sm ease-in {$noteSpaceStore.selectedArea ===
             AREAS[area]
               ? 'tab-active bg-base-content text-base-100'
               : 'bg-base-100 text-base-content'}"

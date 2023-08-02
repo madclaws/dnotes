@@ -37,7 +37,7 @@ export type Gallery = {
 
 export type NoteSpace = {
   publicNotes: Note[] | null
-  privateNotes: Image[] | null
+  privateNotes: Note[] | null
   selectedArea: AREAS
   loading: boolean
 }

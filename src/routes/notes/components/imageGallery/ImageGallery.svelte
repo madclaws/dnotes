@@ -94,11 +94,17 @@ let showDeleteModal = false
 
 const openDeleteNote = (event: CustomEvent) => {
   const deleteNoteIndex = event.detail as number
-  console.log(event)
-  // harcoding public notes here, change later
-  const noteIndex = $noteSpaceStore.publicNotes.findIndex(item => item.src.id === deleteNoteIndex)
+  let noteIndex;
+  let src;
+  if ($noteSpaceStore.selectedArea == "Public") {
+    noteIndex = $noteSpaceStore.publicNotes.findIndex(item => item.src.id === deleteNoteIndex)
+    src = $noteSpaceStore.publicNotes[noteIndex].src;
+  } else {
+    noteIndex = $noteSpaceStore.privateNotes.findIndex(item => item.src.id === deleteNoteIndex)
+    src = $noteSpaceStore.privateNotes[noteIndex].src;
+  }
   if (noteIndex !== -1) {
-    noteToDelete = $noteSpaceStore.publicNotes[noteIndex].src
+    noteToDelete = src
     showDeleteModal = true
   }
 }
@@ -142,11 +148,19 @@ const deleteNote  = (event: CustomEvent) => {
   closeDeleteModal()
   closeEditModal()
   const deleteNoteIndex = event.detail as number
-  // harcoding public notes here, change later
-  const noteIndex = $noteSpaceStore.publicNotes.findIndex(item => item.src.id === deleteNoteIndex)
+  let noteIndex;
+  let name;
+
+  if ($noteSpaceStore.selectedArea == "Public") {
+    noteIndex = $noteSpaceStore.publicNotes.findIndex(item => item.src.id === deleteNoteIndex)
+    name = $noteSpaceStore.publicNotes[noteIndex].src.title;
+  } else {
+    noteIndex = $noteSpaceStore.privateNotes.findIndex(item => item.src.id === deleteNoteIndex)
+    name = $noteSpaceStore.privateNotes[noteIndex].src.title;
+  }
   
   if (noteIndex !== -1) {
-    deleteNoteFromWNFS($noteSpaceStore.publicNotes[noteIndex].src.title);
+    deleteNoteFromWNFS(name);
   }
   // saveNotesToStorage()
 }
