@@ -161,7 +161,8 @@ export const getNotesFromWNFS: () => Promise<void> = async () => {
         const cid = isPrivate
           ? (file as PrivateFile).header.content.toString()
           : (file as PublicFile).cid.toString()
-
+        
+        // deleteNoteFromWNFS("undefined");
         // console.log(file.content);
         // Create a blob to use as the image `src`
         // const blob = new Blob([file.content])

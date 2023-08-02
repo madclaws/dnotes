@@ -121,12 +121,17 @@ const saveNotesToStorage = () => {
   localStorage.setItem('notes', JSON.stringify(notes))
 }
 
-const toggleFavorite = (event: CustomEvent) => {
+const toggleFavorite = async (event: CustomEvent) => {
   const noteId: number = (event.detail as number)
-  const note = notes.find(item => item.id === noteId)
+  let note: NoteType = null;
+  if ($noteSpaceStore.selectedArea == "Public") {
+    note = $noteSpaceStore.publicNotes.find(item => item.src.id === noteId).src;
+  } else {
+    note = $noteSpaceStore.privateNotes.find(item => item.src.id === noteId).src;
+  }
   if (note) {
     note.isFavorite = !note.isFavorite
-    saveNotesToStorage()
+    await uploadNoteToWNFS(note);
   }
 }
 
@@ -180,7 +185,7 @@ const deleteNote  = (event: CustomEvent) => {
           <Fa icon={faPlus} color="#afaeae" size="3x" />
         </div>
           {#each $noteSpaceStore.selectedArea === AREAS.PRIVATE ? $noteSpaceStore.privateNotes : $noteSpaceStore.publicNotes as note (note.cid) }
-            <Note
+          <Note
             {...note.src}
             on:click="{() => { openEditNote(note.src)}}"
             on:toggleFavorite="{toggleFavorite}"
