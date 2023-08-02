@@ -186,7 +186,7 @@ export const getNotesFromWNFS: () => Promise<void> = async () => {
     // NOTE: this will eventually be controlled via the UI
     notes = notes.filter(a => !!a)
     notes.sort((a, b) => b.ctime - a.ctime)
-    
+    console.log(notes);
     // Push images to the noteSpaceStore
     noteSpaceStore.update(store => ({
       ...store,
@@ -256,6 +256,7 @@ export const uploadImageToWNFS: (
 export const uploadNoteToWNFS: (
   note: NoteType
 ) => Promise<void> = async note => {
+  let status = "published";
   try {
     const { selectedArea } = getStore(noteSpaceStore)
     const fs = getStore(filesystemStore)
@@ -275,7 +276,8 @@ export const uploadNoteToWNFS: (
       odd.path.combine(GALLERY_DIRS[selectedArea], odd.path.file(noteFile.name))
     )
     if (fileExists) {
-      throw new Error(`${noteFile.name} note already exists`)
+      // throw new Error(`${noteFile.name} note already exists`)
+      status = "updated"
     }
 
     // Create a sub directory and add some content
@@ -287,7 +289,8 @@ export const uploadNoteToWNFS: (
     // Announce the changes to the server
     await fs.publish()
 
-    addNotification(`${noteFile.name} note has been published`, 'success')
+    addNotification(`${noteFile.name} note has been ${status}`, 'success')
+    await getNotesFromWNFS()
   } catch (error) {
     addNotification(error.message, 'error')
     console.error(error)
