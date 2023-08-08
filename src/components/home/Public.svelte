@@ -45,9 +45,9 @@
         <a class="btn btn-primary !btn-lg !h-10 gap-2" href="/register">
           <Connect /> Connect this device
         </a>
-        <!-- <a class="btn btn-outline" href="/recover">
+        <a class="btn btn-outline" href="/recover">
           Recover an existing account
-        </a> -->
+        </a>
       </div>
     {/if}
   </div>

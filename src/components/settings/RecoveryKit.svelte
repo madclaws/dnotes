@@ -6,7 +6,7 @@
   const handleToggleModal = async () => (modalOpen = !modalOpen)
 </script>
 
-<!-- <div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4">
   <h3 class="text-lg">Recovery Kit</h3>
   <p>
     Your recovery kit will restore access to your data in the event that you
@@ -17,7 +17,7 @@
   <button class="btn btn-primary w-fit" on:click={handleToggleModal}>
     Create your recovery kit
   </button>
-</div> -->
+</div>
 
 {#if modalOpen}
   <RecoveryKitModal {handleToggleModal} />
