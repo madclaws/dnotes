@@ -167,7 +167,7 @@ export const getNotesFromWNFS: () => Promise<void> = async () => {
         // Create a blob to use as the image `src`
         // const blob = new Blob([file.content])
         const src = JSON.parse(new TextDecoder().decode(file.content));
-
+        src.cid = cid;
         const ctime = isPrivate
           ? (file as PrivateFile).header.metadata.unixMeta.ctime
           : (file as PublicFile).header.metadata.unixMeta.ctime

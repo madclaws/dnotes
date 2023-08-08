@@ -7,6 +7,7 @@ export interface NoteType {
   date: string
   isFavorite: boolean
   tags: string[]
+  cid: string;
 }
 
 export const formatDate = (dateString: string): string => {

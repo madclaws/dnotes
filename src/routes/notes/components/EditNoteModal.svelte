@@ -13,6 +13,7 @@
   export let content: string | undefined = undefined
   export let isFavorite: boolean  = false
   export let tags: string[] | undefined = undefined
+  export let cid: string | undefined = undefined;
 
   let tagString = tags && tags.length ? tags.join(',') : ''
 
@@ -75,6 +76,11 @@
       <div class="label">Last Updated:</div>
       <div class="text">{formatDate(date)}</div>
     {/if}
+
+    <!-- {#if date} -->
+    <div class="label">CID:</div>
+    <div class="text">{cid}</div>
+  <!-- {/if} -->
   </div>
 
   <div slot="footer" class="modal-footer">
